@@ -8,17 +8,39 @@
 #include <Adafruit_NeoPixel.h>
 
 #define PIN            2
+#define PIN_BOTON      3        //El pin tiene que sorportar interrupción
 #define NUMPIXELS      14
+unsigned int pulsacion = 0;
 
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 
-
 void setup() {
   pixels.begin();
+  pinMode(PIN_BOTON, INPUT);
+  attachInterrupt(digitalPinToInterrupt(PIN_BOTON), boton_pulsado, RISING);
+  Serial.begin(115200);
 }
 
 void loop() {
-  emergencia4();
+
+  Serial.println(pulsacion);
+  switch (pulsacion % 3) {   // 3 Funciones diferentes
+    case 0:
+      emergencia4();
+      break;
+    case 1:
+      emergencia5();
+      break;
+    case 2:
+      emergencia1();
+      break;
+
+  }
+}
+
+void boton_pulsado() {
+  delay(1000);
+  pulsacion++;
 }
 
 //=================================================
@@ -47,6 +69,7 @@ void rango_color(byte led_inicio, byte led_fin, byte r, byte g, byte b) {
 // Flash color amarillo en secciones de 4 LEDs a 360
 //#
 void emergencia4() {
+  todos_color(0, 0, 0);
   // Flash de dos secciones opuestas
   for (int flash = 0; flash < 3; flash++) {
     rango_color(0, 3, 255, 165, 0);
@@ -78,7 +101,7 @@ void emergencia5() {
   pixels.setBrightness(255);
   rango_color(0, 7, 255, 255, 255);
   pixels.show();
-  delay(50000);
+  //delay(50000);
 }
 
 //#
